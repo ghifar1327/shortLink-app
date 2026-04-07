@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"fmt"
 	"shortLink-app/internals/dto"
 	"time"
 
@@ -25,7 +26,7 @@ func (r *LinkRepository) CreateLink(ctx context.Context, link dto.CreateLinkRequ
 	_, err := r.db.Exec(ctx, query,
 		link.UserID,
 		link.OriginalURL,
-		link.Slug,
+		fmt.Sprintf("https://short.link/%s", link.Slug),
 		time.Now(),
 	)
 	return err
