@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"shortLink-app/internals/dto"
 	"shortLink-app/internals/models"
 	"time"
 
@@ -27,13 +28,13 @@ func NewUserrepository(db *pgxpool.Pool, rdb *redis.Client) *UserRepository {
 
 // ====================================================================================================================================================  Create User
 
-func (r *UserRepository) CreateUser(ctx context.Context, u models.User) error {
+func (r *UserRepository) CreateUser(ctx context.Context, u dto.RegisterRequest) error {
 	query := `INSERT INTO users ( email, password_hash, created_at) VALUES ($1, $2, $3)`
 	_, err := r.db.Exec(ctx, query,
 		u.Email,
-		u.PasswordHash,
-		u.CreatedAt)
-
+		u.Password,
+		time.Now(),
+	)
 	return err
 }
 
@@ -93,15 +94,15 @@ func (r *UserRepository) DeleteUser(ctx context.Context, id int) error {
 }
 
 func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
-	key := fmt.Sprintf("user:email:%s", email)
+	// key := fmt.Sprintf("user:email:%s", email)
 
-	cached, err := r.rdb.Get(ctx, key).Result()
-	if err == nil {
-		var result models.User
-		if err := json.Unmarshal([]byte(cached), &result); err == nil {
-			return &result, nil
-		}
-	}
+	// cached, err := r.rdb.Get(ctx, key).Result()
+	// if err == nil {
+	// 	var result models.User
+	// 	if err := json.Unmarshal([]byte(cached), &result); err == nil {
+	// 		return &result, nil
+	// 	}
+	// }
 	query := `
 		SELECT 
 			id,
@@ -126,10 +127,10 @@ func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*mod
 		return nil, err
 	}
 
-	data, err := json.Marshal(user)
-	if err == nil {
-		r.rdb.Set(ctx, key, data, time.Minute*15)
-	}
+	// data, err := json.Marshal(user)
+	// if err == nil {
+	// 	r.rdb.Set(ctx, key, data, time.Minute*15)
+	// }
 
 	return &user, nil
 }
