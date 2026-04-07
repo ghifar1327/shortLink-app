@@ -1,11 +1,14 @@
-import React, { useState } from 'react'
+import React, { useContext } from 'react'
 import { Button } from './common/Button'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Plus } from 'lucide-react'
+import AuthContext from '../context/AuthContex'
 
 export default function Header() {
   const navigate = useNavigate()
-  const [isLogin, setIsLogin] = useState(true)
+  const { logout } = useContext(AuthContext); 
+  const isLogin = !!localStorage.getItem("token")
+
   const location = useLocation()
 
   return (
@@ -26,9 +29,9 @@ export default function Header() {
             <img src="/User profile.png" alt="user" className='rounded-full'/>
           </Link>
           <button className="" onClick={() => {
-              localStorage.removeItem("token")
-              setIsLogin(false)
-            }}>
+            logout();
+            navigate("/")
+          }}>
             Log out
           </button>
         </>
