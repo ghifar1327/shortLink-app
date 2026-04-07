@@ -28,7 +28,7 @@ func NewLinkHandler(s *services.LinkServices) *LinkHandler {
 // @Success 200 {object} dto.Response
 // @Failure 400 {object} dto.Response
 // @Failure 500 {object} dto.Response
-// @Router /links [post]
+// @Router /api/links [post]
 func (h *LinkHandler) CreateLink(ctx *gin.Context) {
 	var req dto.CreateLinkRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -67,7 +67,7 @@ func (h *LinkHandler) CreateLink(ctx *gin.Context) {
 // @Success 200 {object} dto.Response
 // @Failure 400 {object} dto.Response
 // @Failure 500 {object} dto.Response
-// @Router /links/{user_id} [get]
+// @Router /api/links/{user_id} [get]
 func (h *LinkHandler) GetAllLinkByUserID(ctx *gin.Context) {
 	userID, err := strconv.Atoi(ctx.Param("user_id"))
 	if err != nil {
@@ -105,7 +105,7 @@ func (h *LinkHandler) GetAllLinkByUserID(ctx *gin.Context) {
 // @Success 200 {object} dto.Response
 // @Failure 400 {object} dto.Response
 // @Failure 500 {object} dto.Response
-// @Router /links/{id} [delete]
+// @Router /api/links/{id} [delete]
 func (h *LinkHandler) SoftDeleteLink(ctx *gin.Context) {
 	id, err:= strconv.Atoi(ctx.Param("id"))
 	if err != nil {

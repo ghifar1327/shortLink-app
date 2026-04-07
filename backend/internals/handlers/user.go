@@ -28,7 +28,7 @@ func NewUserHandler(s *services.UserServices) *UserHandler {
 // @Param user body dto.RegisterRequest true "Register Request"
 // @Success 200 {object} dto.Response
 // @Failure 400 {object} dto.Response
-// @Router /auth/register [post]
+// @Router /api/auth/register [post]
 func (h *UserHandler) Register(ctx *gin.Context) {
 	var req dto.RegisterRequest
 
@@ -73,7 +73,7 @@ func (h *UserHandler) Register(ctx *gin.Context) {
 // @Param user body dto.LoginRequest true "Login Request"
 // @Success 200 {object} dto.Response
 // @Failure 400 {object} dto.Response
-// @Router /auth/login [post]
+// @Router /api/auth/login [post]
 func (h *UserHandler) Login(ctx *gin.Context) {
 	var req dto.LoginRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {

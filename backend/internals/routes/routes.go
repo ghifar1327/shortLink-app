@@ -25,12 +25,12 @@ func Router(r *gin.Engine, container *di.Container) {
 	userHandler := container.UserHandler()
 	linkHandler := container.LinkHandler()
 
-	auth := r.Group("/auth")
+	auth := r.Group("/api/auth")
 	{
 		auth.POST("/login", userHandler.Login)
 		auth.POST("/register", userHandler.Register)
 	}
-	link := r.Group("links")
+	link := r.Group("/api/links")
 	link.Use(middleware.AuthMiddleware())
 	{
 		link.POST("", linkHandler.CreateLink)
