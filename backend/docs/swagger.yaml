@@ -1,5 +1,14 @@
 basePath: /
 definitions:
+  dto.CreateLinkRequest:
+    properties:
+      original_url:
+        type: string
+      slug:
+        type: string
+      user_id:
+        type: integer
+    type: object
   dto.LoginRequest:
     properties:
       email:
@@ -90,4 +99,92 @@ paths:
       summary: Register new user
       tags:
       - Authentication
+  /links:
+    post:
+      consumes:
+      - application/json
+      description: Create a new short link for a user
+      parameters:
+      - description: Create Link Request
+        in: body
+        name: link
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateLinkRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Create a new short link
+      tags:
+      - Links
+  /links/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete a link by ID and return updated list of links
+      parameters:
+      - description: Link ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Soft delete a link
+      tags:
+      - Links
+  /links/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all short links for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Get all links by user ID
+      tags:
+      - Links
 swagger: "2.0"
