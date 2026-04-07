@@ -20,6 +20,11 @@ type Container struct {
 	userRepo    *repositories.UserRepository
 	userService *services.UserServices
 	userHandler *handlers.UserHandler
+
+	// LINKS
+	linkRepo     *repositories.LinkRepository
+	linkServices *services.LinkServices
+	linkHandler  *handlers.LinkHandler
 }
 
 func NewContainer(db *pgxpool.Pool) *Container {
@@ -46,8 +51,18 @@ func (c *Container) initDependencies() {
 	c.userRepo = repositories.NewUserrepository(c.db, c.rdb)
 	c.userService = services.NewUserServices(c.userRepo)
 	c.userHandler = handlers.NewUserHandler(c.userService)
+
+	// LINKS
+	c.linkRepo = repositories.NewLinkRepository(c.db)
+	c.linkServices = services.NewLinkServices(c.linkRepo)
+	c.linkHandler = handlers.NewLinkHandler(c.linkServices)
+
 }
 
 func (c *Container) UserHandler() *handlers.UserHandler {
 	return c.userHandler
+}
+
+func (c *Container) LinkHandler() *handlers.LinkHandler {
+	return c.linkHandler
 }
