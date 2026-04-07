@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Children } from 'react'
 import { Button } from './Button';
 
-export default function Input({ size, label, type, id, password,text,  children, ...rest }) {
+export default function Input({ size, label, type, id, password,text, gray = false, children, ...rest }) {
     const [show, setShow] = useState(false);
     function tooglePWD(e) {
       e.preventDefault();
@@ -19,7 +19,7 @@ export default function Input({ size, label, type, id, password,text,  children,
             </label>
             <span>{children}</span>
             <div
-              className={`${size ? size : "flex items-center gap-3 mt-2 p-2 px-3"} ${type !== "checkbox" && "border border-[#DEDEDE] rounded-md w-full"} `}
+              className={`${size ? size : "flex items-center gap-3 mt-2 p-2 px-3"} ${gray && "bg-gray-100"} ${type !== "checkbox" && "border border-[#DEDEDE] rounded-md w-full"} `}
             >
               <span className="w-full">
                 <input
