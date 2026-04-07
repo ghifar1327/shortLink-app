@@ -8,10 +8,16 @@ import LandingPage from './pages/LandingPage';
 import AuthLayout from './layouts/AuthLayout';
 import Dashboard from './pages/Dashboard';
 import CreateLink from './pages/CreateLink';
+import { AuthProvider } from './context/AuthContex.jsx';
+import { LinkProvider } from './context/LinkContex.jsx';
 
 export default function App() {
   return (
-    <Router></Router>
+    <AuthProvider>
+      <LinkProvider>
+       <Router></Router>
+      </LinkProvider>
+    </AuthProvider>
   )
 }
 
