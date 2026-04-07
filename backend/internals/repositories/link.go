@@ -2,11 +2,12 @@ package repositories
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"shortLink-app/internals/dto"
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -17,19 +18,29 @@ type LinkRepository struct {
 func NewLinkRepository(db *pgxpool.Pool) *LinkRepository {
 	return &LinkRepository{db: db}
 }
-
 func (r *LinkRepository) CreateLink(ctx context.Context, link dto.CreateLinkRequest) error {
 	query := `
 	INSERT INTO links (user_id, original_url, slug, created_at)
 	VALUES ($1,$2,$3,$4)
 	`
+
 	_, err := r.db.Exec(ctx, query,
 		link.UserID,
 		link.OriginalURL,
-		fmt.Sprintf("https://short.link/%s", link.Slug),
+		link.Slug,
 		time.Now(),
 	)
-	return err
+
+	if err != nil {
+		if pgErr, ok := err.(*pgconn.PgError); ok {
+			if pgErr.Code == "23505" {
+				return errors.New("slug already exists")
+			}
+		}
+		return err
+	}
+
+	return nil
 }
 
 func (r *LinkRepository) GetAllLinkByUserID(ctx context.Context, userId int) ([]dto.LinkResponse, error) {
