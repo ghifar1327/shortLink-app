@@ -84,7 +84,6 @@ func (r *UserRepository) GetUserByID(ctx context.Context, id int) (*models.User,
 	return &user, nil
 }
 
-
 // ======================================================================================================== DELETE USER
 func (r *UserRepository) DeleteUser(ctx context.Context, id int) error {
 	query := `DELETE FROM users WHERE id=$1`
@@ -107,7 +106,7 @@ func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*mod
 		SELECT 
 			id,
 			email,
-			password,
+			password_hash,
 			created_at
 		FROM users
 		WHERE email=$1
@@ -121,6 +120,9 @@ func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*mod
 
 	user, err := pgx.CollectOneRow(row, pgx.RowToStructByName[models.User])
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, fmt.Errorf("user not found")
+		}
 		return nil, err
 	}
 
