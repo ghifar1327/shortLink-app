@@ -1,11 +1,11 @@
 package utils
 
-import (
-	"github.com/alexedwards/argon2id"
-)
+import "github.com/matthewhartstonge/argon2"
+
+var argon = argon2.DefaultConfig()
 
 func HashPassword(password string) (string, error) {
-	hash, err := argon2id.CreateHash(password, argon2id.DefaultParams)
+	hash, err := argon.HashEncoded([]byte(password))
 	if err != nil {
 		return "", err
 	}
@@ -13,5 +13,5 @@ func HashPassword(password string) (string, error) {
 }
 
 func VerifyPassword(password string, encodedHash string) (bool, error) {
-	return argon2id.ComparePasswordAndHash(password, encodedHash)
+	return argon2.VerifyEncoded([]byte(password), []byte(encodedHash))
 }
