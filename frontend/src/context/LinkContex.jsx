@@ -6,10 +6,11 @@ const LinkContext = createContext();
 export function LinkProvider({ children }) {
   const user = JSON.parse(localStorage.getItem("user"));
   const [links, setLinks] = useState([]);
+
   
   async function fetchLinks() {
     try {
-      const res = await http("/api/links/user/" + user.id);
+      const res = await http("/api/links/" + user.id);
       if (!res.success) {
         throw new Error(res.message);
       }
