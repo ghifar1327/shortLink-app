@@ -31,6 +31,7 @@ func Router(r *gin.Engine, container *di.Container) {
 		auth.POST("/register", userHandler.Register)
 	}
 	link := r.Group("links")
+	link.Use(middleware.AuthMiddleware())
 	{
 		link.POST("", linkHandler.CreateLink)
 		link.GET("/:user_id", linkHandler.GetAllLinkByUserID)
