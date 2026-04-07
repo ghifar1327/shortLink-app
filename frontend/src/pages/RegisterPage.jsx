@@ -9,7 +9,7 @@ export default function RegisterPage() {
   return (
     <>
      <div className='text-center flex flex-col gap-3'>
-       <h1 className="text-3xl font-semibold">Cteate Accound</h1>
+       <h1 className="text-3xl font-semibold">Cteate Account</h1>
        <p className="text-gray-500">Join the elite architects of the web.</p>
      </div>
      <section className="border border-gray-300 shadow-2xl w-[20%] flex flex-col gap-5 p-5 py-10 rounded bg-white">
