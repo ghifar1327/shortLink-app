@@ -86,7 +86,7 @@ func (h *UserHandler) Login(ctx *gin.Context) {
 
 	user, err := h.service.GetUserBYEmail(ctx.Request.Context(), req.Email)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, dto.Response{
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
 			Success: false,
 			Message: err.Error(),
 		})
@@ -94,7 +94,7 @@ func (h *UserHandler) Login(ctx *gin.Context) {
 	}
 	token, err := h.service.Login(ctx.Request.Context(), req)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, dto.Response{
+		ctx.JSON(http.StatusInternalServerError, dto.Response{
 			Success: false,
 			Message: err.Error(),
 		})
