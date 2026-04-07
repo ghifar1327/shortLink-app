@@ -23,10 +23,17 @@ func Router(r *gin.Engine, container *di.Container) {
 
 	// handler
 	userHandler := container.UserHandler()
+	linkHandler := container.LinkHandler()
 
 	auth := r.Group("/auth")
 	{
 		auth.POST("/login", userHandler.Login)
 		auth.POST("/register", userHandler.Register)
+	}
+	link := r.Group("links")
+	{
+		link.POST("", linkHandler.CreateLink)
+		link.GET("/:user_id", linkHandler.GetAllLinkByUserID)
+		link.DELETE("/:id", linkHandler.SoftDeleteLink)
 	}
 }
