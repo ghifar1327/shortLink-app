@@ -3,19 +3,19 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"shortLink-app/internals/dto"
 	"shortLink-app/internals/models"
 	"shortLink-app/internals/repositories"
 	"shortLink-app/internals/utils"
 	"strings"
-	"time"
 )
 
 type UserServices struct {
 	repo *repositories.UserRepository
 }
 
-func NewUserServices(repo *repositories.UserRepository) *UserServices{
+func NewUserServices(repo *repositories.UserRepository) *UserServices {
 	return &UserServices{
 		repo: repo,
 	}
@@ -31,7 +31,7 @@ func validateUser(req dto.RegisterRequest) error {
 	if len(req.Password) < 5 {
 		return errors.New("Password must be at least 5 characters")
 	}
-	if req.Password != req.ConfirmPassword{
+	if req.Password != req.ConfirmPassword {
 		return errors.New("comfirm password is not matching")
 	}
 	return nil
@@ -45,14 +45,9 @@ func (r *UserServices) Register(ctx context.Context, req dto.RegisterRequest) er
 	if err != nil {
 		return err
 	}
+	req.Password = hash
 
-	newUser := models.User{
-		Email:        req.Email,
-		PasswordHash: hash,
-		CreatedAt:    time.Now(),
-	}
-
-	return r.repo.CreateUser(ctx, newUser)
+	return r.repo.CreateUser(ctx, req)
 }
 
 func (r UserServices) Login(ctx context.Context, req dto.LoginRequest) (string, error) {
@@ -61,10 +56,12 @@ func (r UserServices) Login(ctx context.Context, req dto.LoginRequest) (string, 
 		return "", errors.New("Email not Registered")
 	}
 	valid, err := utils.VerifyPassword(req.Password, user.PasswordHash)
-
 	if err != nil {
+		fmt.Println("password salah")
+
 		return "", err
 	}
+
 	if valid {
 		token, err := utils.GenerateToken(user)
 		if err != nil {
