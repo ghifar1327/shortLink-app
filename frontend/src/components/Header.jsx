@@ -25,7 +25,7 @@ export default function Header() {
           {
             location.pathname !== "/create-link" && <Button blue onClick={()=> navigate("/create-link")} size={"p-2 px-3"}><Plus/><p>Create New Link</p></Button>
           }
-          <Link className='mr-5'>
+          <Link to="/profile" className='mr-5'>
             <img src="/User profile.png" alt="user" className='rounded-full'/>
           </Link>
           <button className="" onClick={() => {
