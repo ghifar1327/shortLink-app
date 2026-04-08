@@ -1,6 +1,7 @@
 package dto
 
 type RegisterRequest struct {
+	Name            string `json:"name" binding:"required"`
 	Email           string `json:"email" binding:"required"`
 	Password        string `json:"password" binding:"required"`
 	ConfirmPassword string `json:"confirm_password" binding:"required"`
@@ -12,7 +13,10 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Token  string `json:"token"`
-	UserID int    `json:"user_id"`
-	Email  string `json:"email"`
+	Token     string  `json:"token"`
+	Name      string  `json:"name"`
+	Picture   *string `json:"picture"`
+	UserID    int     `json:"user_id"`
+	Email     string  `json:"email"`
+	CreatedAt string  `json:"created_at"`
 }
