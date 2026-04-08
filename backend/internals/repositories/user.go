@@ -148,20 +148,35 @@ func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*mod
 }
 
 func (r *UserRepository) UpdateProfilePicture(ctx context.Context, userId int, pictureURL string) (models.User, error) {
-	query := `
-	INSERT INTO profile_pictures (user_id, url) VALUES ($1, $2)
-	ON CONFLICT (user_id) DO UPDATE SET url = EXCLUDED.url
-	`
-	_, err := r.db.Exec(ctx, query, userId, pictureURL)
+	
+	tx, err := r.db.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return models.User{}, fmt.Errorf("user not found")
-		}
 		return models.User{}, err
 	}
+	defer func() {
+		if err != nil {
+			tx.Rollback(ctx)
+		}
+	}()
+
+	_, err = tx.Exec(ctx, "DELETE FROM profile_pictures WHERE user_id = $1", userId)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	_, err = tx.Exec(ctx, "INSERT INTO profile_pictures (user_id, url) VALUES ($1, $2)", userId, pictureURL)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	if err = tx.Commit(ctx); err != nil {
+		return models.User{}, err
+	}
+
 	user, err := r.GetUserByID(ctx, userId)
 	if err != nil {
 		return models.User{}, err
 	}
+
 	return *user, nil
 }
