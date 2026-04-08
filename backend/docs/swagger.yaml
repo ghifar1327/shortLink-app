@@ -25,11 +25,14 @@ definitions:
         type: string
       email:
         type: string
+      name:
+        type: string
       password:
         type: string
     required:
     - confirm_password
     - email
+    - name
     - password
     type: object
   dto.Response:
@@ -39,6 +42,19 @@ definitions:
       results: {}
       success:
         type: boolean
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      picture:
+        type: string
     type: object
 host: localhost:8888
 info:
@@ -208,4 +224,44 @@ paths:
       summary: Get all links by user ID
       tags:
       - Links
+  /users/{id}/picture:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload a profile picture for a specific user by user ID. Max size
+        1MB.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Profile picture file
+        in: formData
+        name: picture
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Picture uploaded successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.Response'
+            - properties:
+                results:
+                  $ref: '#/definitions/models.User'
+              type: object
+        "400":
+          description: Bad request (invalid ID or missing/too large file)
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Upload profile picture for user
+      tags:
+      - Users
 swagger: "2.0"
