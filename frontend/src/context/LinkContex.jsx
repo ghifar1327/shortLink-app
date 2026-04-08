@@ -37,9 +37,9 @@ export function LinkProvider({ children }) {
       if (!res.success) {
         throw new Error(res.message);
       }
-      fetchLinks();
+      setLinks(res.results);
     } catch (err) {
-      return err
+        return err
     }
   } 
   return (
