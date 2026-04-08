@@ -4,6 +4,7 @@ import (
 	"context"
 	"shortLink-app/internals/dto"
 	"shortLink-app/internals/repositories"
+	"shortLink-app/internals/utils"
 )
 
 type LinkServices struct {
@@ -16,6 +17,10 @@ func NewLinkServices(repo *repositories.LinkRepository) *LinkServices {
 	}
 }
 func (s *LinkServices) CreateLink(ctx context.Context, link dto.CreateLinkRequest) error {
+	if link.Slug == "" {
+		link.Slug = utils.GenerateSlug(4)
+	}
+	link.Slug = "short.link/" + link.Slug
 	return s.repo.CreateLink(ctx, link)
 }
 func (s *LinkServices) GetAllLinkByUserID(ctx context.Context, id int) ([]dto.LinkResponse, error) {
