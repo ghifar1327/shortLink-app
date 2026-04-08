@@ -95,6 +95,29 @@ func (h *LinkHandler) GetAllLinkByUserID(ctx *gin.Context) {
 	})
 }
 
+
+// Redirect godoc
+// @Summary Redirect to original URL
+// @Description Redirect user to the original URL based on slug
+// @Tags Redirect
+// @Param slug path string true "Short link slug"
+// @Success 301 {string} string "Moved Permanently (Redirect)"
+// @Failure 404 {object} dto.Response
+// @Router /{slug} [get]
+func (h *LinkHandler) RedirectLink(ctx *gin.Context) {
+	slug := ctx.Param("slug")
+
+	url, err := h.service.RedirectLink(ctx, slug)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, dto.Response{
+			Success: false,
+			Message: "Link not found",
+		})
+		return
+	}
+	ctx.Redirect(http.StatusMovedPermanently, url)
+}
+
 // SoftDeleteLink godoc
 // @Summary Soft delete a link
 // @Description Soft delete a link by ID and return updated list of links
