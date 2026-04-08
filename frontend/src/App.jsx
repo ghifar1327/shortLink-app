@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import CreateLink from './pages/CreateLink';
 import { AuthProvider } from './context/AuthContex.jsx';
 import { LinkProvider } from './context/LinkContex.jsx';
+import Profile from './pages/Profile.jsx';
 
 export default function App() {
   return (
@@ -30,7 +31,8 @@ function Router() {
       children: [
         { index: true, element: <LandingPage/>},
         {path: "dashboard", element: <Dashboard/>},
-        {path: "create-link",element: <CreateLink/>}
+        {path: "create-link",element: <CreateLink/>},
+        {path: "profile", element: <Profile/>}
       ]
     },
     {
