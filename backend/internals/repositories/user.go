@@ -29,13 +29,29 @@ func NewUserrepository(db *pgxpool.Pool, rdb *redis.Client) *UserRepository {
 // ====================================================================================================================================================  Create User
 
 func (r *UserRepository) CreateUser(ctx context.Context, u dto.RegisterRequest) error {
-	query := `INSERT INTO users ( email, password_hash, created_at) VALUES ($1, $2, $3)`
-	_, err := r.db.Exec(ctx, query,
-		u.Email,
-		u.Password,
-		time.Now(),
-	)
-	return err
+	tx, err := r.db.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback(ctx)
+		}
+	}()
+
+	query := `INSERT INTO users (name, email, password_hash, created_at) VALUES ($1, $2, $3, $4)`
+	_, err = tx.Exec(ctx, query, u.Name, u.Email, u.Password, time.Now())
+	if err != nil {
+		return err
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // ==================================================================================================================================================== Get User By ID
@@ -55,11 +71,13 @@ func (r *UserRepository) GetUserByID(ctx context.Context, id int) (*models.User,
 	// ================= DB =================
 	query := `
 		SELECT 
-			id, 
-			email,
-			password_hash,
-			created_at FROM users
-		WHERE id=$1
+			u.id, 
+			u.name,
+			u.email,
+			u.created_at,
+			p.url AS picture FROM users u
+			LEFT JOIN profile_pictures p ON u.id = p.user_id
+		WHERE u.id=$1
 	`
 
 	rows, err := r.db.Query(ctx, query, id)
@@ -94,23 +112,16 @@ func (r *UserRepository) DeleteUser(ctx context.Context, id int) error {
 }
 
 func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
-	// key := fmt.Sprintf("user:email:%s", email)
-
-	// cached, err := r.rdb.Get(ctx, key).Result()
-	// if err == nil {
-	// 	var result models.User
-	// 	if err := json.Unmarshal([]byte(cached), &result); err == nil {
-	// 		return &result, nil
-	// 	}
-	// }
 	query := `
-		SELECT 
-			id,
-			email,
-			password_hash,
-			created_at
-		FROM users
-		WHERE email=$1
+		SELECT
+		u.id, 
+		u.name,
+		u.email,
+		u.password_hash,
+		u.created_at,
+		p.url AS picture FROM users u
+		LEFT JOIN profile_pictures p ON u.id = p.user_id
+		WHERE u.email=$1
 	`
 	row, err := r.db.Query(ctx, query, email)
 	if err != nil {
@@ -119,18 +130,38 @@ func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*mod
 
 	defer row.Close()
 
-	user, err := pgx.CollectOneRow(row, pgx.RowToStructByName[models.User])
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, fmt.Errorf("user not found")
+	var user models.User
+	if row.Next() {
+		err = row.Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash, &user.CreatedAt, &user.Picture)
+		if err != nil {
+			return nil, err
 		}
+	} else {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	if err = row.Err(); err != nil {
 		return nil, err
 	}
 
-	// data, err := json.Marshal(user)
-	// if err == nil {
-	// 	r.rdb.Set(ctx, key, data, time.Minute*15)
-	// }
-
 	return &user, nil
+}
+
+func (r *UserRepository) UpdateProfilePicture(ctx context.Context, userId int, pictureURL string) (models.User, error) {
+	query := `
+	INSERT INTO profile_pictures (user_id, url) VALUES ($1, $2)
+	ON CONFLICT (user_id) DO UPDATE SET url = EXCLUDED.url
+	`
+	_, err := r.db.Exec(ctx, query, userId, pictureURL)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return models.User{}, fmt.Errorf("user not found")
+		}
+		return models.User{}, err
+	}
+	user, err := r.GetUserByID(ctx, userId)
+	if err != nil {
+		return models.User{}, err
+	}
+	return *user, nil
 }
