@@ -25,6 +25,7 @@ func Router(r *gin.Engine, container *di.Container) {
 	userHandler := container.UserHandler()
 	linkHandler := container.LinkHandler()
 
+	r.GET("/:slug", linkHandler.RedirectLink)
 	auth := r.Group("/api/auth")
 	{
 		auth.POST("/login", userHandler.Login)

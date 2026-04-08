@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"errors"
+	"os"
 	"shortLink-app/internals/dto"
 	"time"
 
@@ -30,6 +31,9 @@ func (r *LinkRepository) CreateLink(ctx context.Context, link dto.CreateLinkRequ
 		link.Slug,
 		time.Now(),
 	)
+	if err != nil {
+		return err
+	}
 
 	if err != nil {
 		if pgErr, ok := err.(*pgconn.PgError); ok {
@@ -54,11 +58,37 @@ func (r *LinkRepository) GetAllLinkByUserID(ctx context.Context, userId int) ([]
 		return nil, err
 	}
 
-	link, err := pgx.CollectRows(rows, pgx.RowToStructByName[dto.LinkResponse])
+	links, err := pgx.CollectRows(rows, pgx.RowToStructByName[dto.LinkResponse])
 	if err != nil {
 		return nil, err
 	}
-	return link, nil
+	baseURL := os.Getenv("BACKEND_URL")
+
+	for i := range links {
+		link := baseURL + "/" + links[i].Slug
+		links[i].ShortLink = &link
+	}
+
+	return links, nil
+}
+
+func (r *LinkRepository) GetBySlug(ctx context.Context, slug string) (string, error) {
+	query := `
+		SELECT original_url
+		FROM links
+		WHERE slug=$1 AND deleted_at IS NULL
+	`
+
+	var url string
+	err := r.db.QueryRow(ctx, query, slug).Scan(&url)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return "", errors.New("link not found")
+		}
+		return "", err
+	}
+
+	return url, nil
 }
 
 func (r *LinkRepository) SoftDeleteLink(ctx context.Context, id int) ([]dto.LinkResponse, error) {

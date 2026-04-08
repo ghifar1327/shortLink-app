@@ -12,5 +12,6 @@ type LinkResponse struct {
 	ID          int       `json:"id" db:"id"`
 	OriginalURL string    `json:"original_url" db:"original_url"`
 	Slug        string    `json:"slug" db:"slug"`
+	ShortLink   *string    `json:"short_link" db:"-"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 }
