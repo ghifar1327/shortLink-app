@@ -8,17 +8,7 @@ export function LinkProvider({ children }) {
   const [links, setLinks] = useState([]);
 
   
-  async function fetchLinks() {
-    try {
-      const res = await http("/api/links/" + user.id);
-      if (!res.success) {
-        throw new Error(res.message);
-      }
-      setLinks(res.results);
-    } catch (err) {
-      return err
-    }
-  }
+
   async function createLink(data) {
     data = { ...data, user_id: user.id }
     try {
@@ -26,7 +16,6 @@ export function LinkProvider({ children }) {
       if (!res.success) {
         throw new Error(res.message);
       }
-      fetchLinks();
     } catch (err) {
       return err
     }
@@ -43,7 +32,7 @@ export function LinkProvider({ children }) {
     }
   } 
   return (
-    <LinkContext.Provider value={{ links, fetchLinks , createLink, deleteLink }}>
+    <LinkContext.Provider value={{ links ,setLinks , createLink, deleteLink }}>
       {children}
     </LinkContext.Provider>
   );
