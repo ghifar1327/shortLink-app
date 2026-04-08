@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"path/filepath"
 	"shortLink-app/internals/dto"
 	"shortLink-app/internals/models"
 	"shortLink-app/internals/services"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -162,7 +164,8 @@ func (h *UserHandler) UploadPicture(ctx *gin.Context) {
 	}
 
 	ext := filepath.Ext(file.Filename)
-	filename :=  "picture_" + strconv.Itoa(id) + ext
+    timestamp := time.Now().UnixNano()
+    filename := fmt.Sprintf("picture_%d_%d%s", id, timestamp, ext)
 
 	err = ctx.SaveUploadedFile(file, "./uploads/"+filename)
 	if err != nil {
