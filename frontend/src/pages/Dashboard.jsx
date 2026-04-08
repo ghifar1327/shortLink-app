@@ -23,7 +23,8 @@ export default function Dashboard() {
         navigate("/login", { replace: true });
       }
       try {
-      const res = await http("/api/links/" + user.id);
+        const res = await http("/api/links/" + user.id);
+        console.log("fetching links")
       if (!res.success) {
         throw new Error(res.message);
       }
