@@ -3,7 +3,7 @@ import { BiCheckShield } from "react-icons/bi";
 import { AiOutlineBell } from "react-icons/ai"; 
 import { BsLink } from "react-icons/bs"; 
 import { AiOutlineCamera } from "react-icons/ai"; 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from "react-router";
 import { Button } from "../components/common/Button";
 import AuthContext from "../context/AuthContex";
@@ -14,7 +14,15 @@ export default function Profile() {
     const { logout , user , updatePicture} = React.useContext(AuthContext);
     const {links} = React.useContext(LinkContext);
     const navigate = useNavigate();
-    console.log(user)
+
+    useEffect(() => {
+    const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!token || !user) {
+        navigate("/login", { replace: true });
+      }
+    }, []);
+    
   return (
    <main className='p-[5%] mt-[3%] px-[25%] flex-1 bg-[#F3F4F5] flex flex-col gap-5'>
       <div className='w-full  bg-white p-8 rounded-2xl flex flex-col gap-10'>
@@ -25,8 +33,18 @@ export default function Profile() {
         <section className='flex items-center gap-5'>
           <div className="relative w-50 aspect-square overflow-hidden rounded">
             <label htmlFor="upload" className="p-2 z-10 rounded-xl bg-white absolute text-primary border-2 border-gray-400 cursor-pointer right-0 bottom-0 hover:bg-gray-100"><AiOutlineCamera size={39}/></label>
-            <img src={ file ? URL.createObjectURL(file) : `${import.meta.env.VITE_BASE_URL}${user?.picture}` || "/profile.png"} alt="user" className='rounded-xl w-full h-full object-cover'/>
-            <input
+            <img 
+               src={
+                 file
+                   ? URL.createObjectURL(file)
+                   : user?.picture
+                   ? `${import.meta.env.VITE_BASE_URL}/uploads/${user.picture}`
+                   : "/profile.png"
+               } 
+               alt="user" 
+               className="rounded-xl w-full h-full object-cover"
+             />
+             <input
                   type="file"
                   accept="image/*"
                     onChange={(e) => {
