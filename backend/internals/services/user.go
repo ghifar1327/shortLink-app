@@ -76,3 +76,7 @@ func (r UserServices) Login(ctx context.Context, req dto.LoginRequest) (string, 
 func (s *UserServices) GetUserBYEmail(ctx context.Context, email string) (*models.User, error) {
 	return s.repo.GetUserByEmail(ctx, email)
 }
+
+func (s *UserServices) UpdateProfilePicture(ctx context.Context, id int, pictureURL string) (models.User, error) {
+	return s.repo.UpdateProfilePicture(ctx, id, pictureURL)
+}	
