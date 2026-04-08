@@ -3,13 +3,13 @@ import Input from "../components/common/Input";
 import { Link, useNavigate } from "react-router";
 import { Button } from "../components/common/Button";
 import { ArrowRight } from "lucide-react";
-import { AiOutlineGoogle } from "react-icons/ai";
 import AuthContext from "../context/AuthContex";
 
 export default function RegisterPage() {
   const { register } = useContext(AuthContext);
   const navigate = useNavigate(); 
   const [form, setForm] = useState({
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -44,6 +44,14 @@ export default function RegisterPage() {
         <p className="text-gray-500">Join the elite architects of the web.</p>
       </div>
       <form onSubmit={handleSubmit} className="border border-gray-300 shadow-2xl w-[20%] flex flex-col gap-5 p-5 py-10 rounded bg-white">
+        <Input
+          id={"name"}
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+        >
+          Name
+        </Input>
         <Input
           id={"email"}
           name="email"
