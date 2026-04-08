@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/auth/login": {
+        "/api/auth/login": {
             "post": {
                 "description": "Create a new user account",
                 "consumes": [
@@ -55,7 +55,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/register": {
+        "/api/auth/register": {
             "post": {
                 "description": "Create a new user account",
                 "consumes": [
@@ -95,7 +95,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/links": {
+        "/api/links": {
             "post": {
                 "description": "Create a new short link for a user",
                 "consumes": [
@@ -141,7 +141,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/links/{id}": {
+        "/api/links/{id}": {
             "delete": {
                 "description": "Soft delete a link by ID and return updated list of links",
                 "consumes": [
@@ -185,7 +185,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/links/{user_id}": {
+        "/api/links/{user_id}": {
             "get": {
                 "description": "Retrieve all short links for a specific user",
                 "consumes": [
@@ -222,6 +222,38 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/{slug}": {
+            "get": {
+                "description": "Redirect user to the original URL based on slug",
+                "tags": [
+                    "Redirect"
+                ],
+                "summary": "Redirect to original URL",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Short link slug",
+                        "name": "slug",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "301": {
+                        "description": "Moved Permanently (Redirect)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/dto.Response"
                         }
