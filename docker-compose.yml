@@ -1,0 +1,62 @@
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ghifar
+      POSTGRES_PASSWORD: "1"
+      POSTGRES_DB: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    environment:
+      PORT: 8888
+      DATABASE_URL: postgres://ghifar:1@db:5432/postgres?sslmode=disable
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      SECRET_KEY: 87079797a0e9e86c87b44bdcfa59e176f627e64643c2afa5edbb39a6612d8444
+      BACKEND_URL: http://localhost:8888
+      FRONTEND_URL: http://localhost:5173
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./backend/uploads:/app/uploads
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_BASE_URL: http://short.link-app
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+  proxy:
+    image: nginx:stable-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./proxy.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  db-data:
