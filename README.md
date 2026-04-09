@@ -182,16 +182,36 @@ Authorization: Bearer <JWT_TOKEN>
     "slug": "my-short-slug"
   }
   ```
+- Response:
+  ```json
+  {
+    "success": true,
+    "message": "Link created",
+    "results": null
+  }
+  ```
 
 #### Get User Links
 
 - `GET /api/links/:user_id`
 - Example: `/api/links/1`
+- Response:
+  ```json
+  {
+    "success": true,
+    "message": "list of links",
+    "results": [
+      {
+        "id": 1,
+        "original_url": "https://example.com/page",
+        "slug": "my-short-slug",
+        "short_link": "http://short.link-app/my-short-slug",
+        "created_at": "2026-04-09T12:34:56Z"
+      }
+    ]
+  }
+  ```
 
-#### Soft Delete Link
-
-- `DELETE /api/links/:id`
-- Example: `/api/links/10`
 
 ## Frontend Workflow
 
